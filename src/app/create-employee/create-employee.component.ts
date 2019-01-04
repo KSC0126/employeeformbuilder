@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
+import { ValueConverter } from '@angular/compiler/src/render3/view/template';
 
 
 @Component({
@@ -10,6 +11,7 @@ import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms'
 export class CreateEmployeeComponent implements OnInit {
 
   employeeForm : FormGroup;
+  fullNameLength = 0;
 
   constructor(private fb: FormBuilder) { }
 
@@ -26,6 +28,16 @@ export class CreateEmployeeComponent implements OnInit {
    
       
     });
+    // this.employeeForm.valueChanges.subscribe((value:any) =>{
+    //   console.log(JSON.stringify(value)); // to capture total form value
+    // });
+    this.employeeForm.get('skills').valueChanges.subscribe((value:any) =>{
+      console.log(JSON.stringify(value)); // to capture nested form form value
+    });
+    //  this.employeeForm.get('fullName').valueChanges.subscribe((value:any) =>{
+    //   console.log(value);
+    // });//to check only single value in the form
+    
   }
   onSubmit():void{
     console.log(this.employeeForm.touched); 
