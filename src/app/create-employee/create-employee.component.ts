@@ -11,7 +11,24 @@ import { ValueConverter } from '@angular/compiler/src/render3/view/template';
 export class CreateEmployeeComponent implements OnInit {
 
   employeeForm : FormGroup;
-  fullNameLength = 0;
+  validationsMessages={
+'fullName' :{
+  'required':' Full name is required.',
+  'minLenght':' Full name must be greater than 2 characters.',
+  'maxLenght':' Full name must be greater than 10 characters.',
+}, 'email': {
+  'required': 'Email is required.'
+},
+'skillName': {
+  'required': 'Skill Name is required.',
+},
+'experienceInYears': {
+  'required': 'Experience is required.',
+},
+'proficiency': {
+  'required': 'Proficiency is required.',
+},
+  }
 
   constructor(private fb: FormBuilder) { }
 
@@ -32,12 +49,25 @@ export class CreateEmployeeComponent implements OnInit {
     //   console.log(JSON.stringify(value)); // to capture total form value
     // });
     this.employeeForm.get('skills').valueChanges.subscribe((value:any) =>{
-      console.log(JSON.stringify(value)); // to capture nested form form value
+      //console.log(JSON.stringify(value)); // to capture nested form form value
     });
     //  this.employeeForm.get('fullName').valueChanges.subscribe((value:any) =>{
     //   console.log(value);
     // });//to check only single value in the form
     
+  }
+  logKeyValuePairs(group: FormGroup):void{
+    Object.keys(group.controls).forEach((key: string)=> {
+      const abstractControl = group.get(key); // we wrote it as we dont know whether the key is coming form from or nested form
+      if(abstractControl instanceof FormGroup) {
+        this.logKeyValuePairs(abstractControl); 
+
+      }else{
+        console.log(abstractControl.value);
+        abstractControl.disable();
+      }
+    })  
+
   }
   onSubmit():void{
     console.log(this.employeeForm.touched); 
@@ -45,19 +75,10 @@ export class CreateEmployeeComponent implements OnInit {
     console.log(this.employeeForm.get('fullName').value);
   }
   LoadDataClicked():void{ 
-    this.employeeForm.setValue({ // set only a sub set of this form we use patchvalue instead of setvalue
-      fullName: 'showrya',
-      email:'a@b.com',
-        skills:{
-          skillName: 'Angular',
-          experienceInYears:'2+ yrs',
-          proficiency:'intermediate'
+    this.logKeyValuePairs(this.employeeForm);
 
         }
       
 
-    })
-
-  }
-
+    
 }
