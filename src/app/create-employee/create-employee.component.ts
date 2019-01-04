@@ -11,6 +11,14 @@ import { ValueConverter } from '@angular/compiler/src/render3/view/template';
 export class CreateEmployeeComponent implements OnInit {
 
   employeeForm : FormGroup;
+
+  formErrors = {
+    'fullName': '',
+    'email': '',
+    'skillName': '',
+    'experienceInYears': '',
+    'proficiency': ''
+  };
   validationsMessages={
 'fullName' :{
   'required':' Full name is required.',
@@ -35,11 +43,11 @@ export class CreateEmployeeComponent implements OnInit {
   ngOnInit() {
     this.employeeForm = this.fb.group({
       fullName:['',[Validators.required, Validators.minLength(2), Validators.maxLength(10)]],
-      email: [''],
+      email: ['',Validators.required],
       skills: this.fb.group({
-        skillName:[''],
-        experienceInYears:[''],
-        proficiency:['advanced']
+        skillName:['',Validators.required],
+        experienceInYears:['',Validators.required],
+        proficiency:['',Validators.required]
 
       })
    
@@ -56,15 +64,22 @@ export class CreateEmployeeComponent implements OnInit {
     // });//to check only single value in the form
     
   }
-  logKeyValuePairs(group: FormGroup):void{
+  logValidationErrors(group: FormGroup):void{
     Object.keys(group.controls).forEach((key: string)=> {
       const abstractControl = group.get(key); // we wrote it as we dont know whether the key is coming form from or nested form
       if(abstractControl instanceof FormGroup) {
-        this.logKeyValuePairs(abstractControl); 
+        this.logValidationErrors(abstractControl); 
 
       }else{
-        console.log(abstractControl.value);
-        abstractControl.disable();
+        this.formErrors[key]='';// to clear any existing validations error 
+        if(abstractControl && !abstractControl.valid){
+        const messages = this.validationsMessages[key];
+        for (const errorKey in abstractControl.errors){
+          if(errorKey){
+            this.formErrors[key] += messages[errorKey] + ''; // last lo space to give sapce b/w errors if they are more than 1
+          }
+        }
+        }
       }
     })  
 
@@ -75,7 +90,8 @@ export class CreateEmployeeComponent implements OnInit {
     console.log(this.employeeForm.get('fullName').value);
   }
   LoadDataClicked():void{ 
-    this.logKeyValuePairs(this.employeeForm);
+    this.logValidationErrors(this.employeeForm);
+    console.log(this.formErrors);
 
         }
       
