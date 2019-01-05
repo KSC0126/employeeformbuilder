@@ -22,8 +22,8 @@ export class CreateEmployeeComponent implements OnInit {
   validationsMessages={
 'fullName' :{
   'required':' Full name is required.',
-  'minLenght':' Full name must be greater than 2 characters.',
-  'maxLenght':' Full name must be greater than 10 characters.',
+  'minlength':' Full name must be greater than 2 characters.',
+  'maxlength':' Full name must be greater than 10 characters.',
 }, 'email': {
   'required': 'Email is required.'
 },
@@ -56,15 +56,17 @@ export class CreateEmployeeComponent implements OnInit {
     // this.employeeForm.valueChanges.subscribe((value:any) =>{
     //   console.log(JSON.stringify(value)); // to capture total form value
     // });
-    this.employeeForm.get('skills').valueChanges.subscribe((value:any) =>{
-      //console.log(JSON.stringify(value)); // to capture nested form form value
-    });
+    // this.employeeForm.get('skills').valueChanges.subscribe((value:any) =>{
+    //   //console.log(JSON.stringify(value)); // to capture nested form form value
+    // });
     //  this.employeeForm.get('fullName').valueChanges.subscribe((value:any) =>{
     //   console.log(value);
     // });//to check only single value in the form
-    
+    this.employeeForm.valueChanges.subscribe((data) =>{
+      this.logValidationErrors(this.employeeForm);// inorder to call the logvalidationerrors function with any changes
+    });    
   }
-  logValidationErrors(group: FormGroup):void{
+  logValidationErrors(group: FormGroup= this.employeeForm):void{
     Object.keys(group.controls).forEach((key: string)=> {
       const abstractControl = group.get(key); // we wrote it as we dont know whether the key is coming form from or nested form
       if(abstractControl instanceof FormGroup) {
@@ -72,7 +74,7 @@ export class CreateEmployeeComponent implements OnInit {
 
       }else{
         this.formErrors[key]='';// to clear any existing validations error 
-        if(abstractControl && !abstractControl.valid){
+        if(abstractControl && !abstractControl.valid && (abstractControl.touched || abstractControl.dirty)){
         const messages = this.validationsMessages[key];
         for (const errorKey in abstractControl.errors){
           if(errorKey){
@@ -90,8 +92,8 @@ export class CreateEmployeeComponent implements OnInit {
     console.log(this.employeeForm.get('fullName').value);
   }
   LoadDataClicked():void{ 
-    this.logValidationErrors(this.employeeForm);
-    console.log(this.formErrors);
+    // this.logValidationErrors(this.employeeForm);
+    // console.log(this.formErrors);
 
         }
       
