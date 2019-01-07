@@ -116,6 +116,11 @@
 
 </form>
 
+<br>
+<div class="yourCssClass" *ngIf="this.isButtonVisible" (click)="this.isButtonVisible = false">
+ <button class="btn-primary"> i will hide</button>
+  </div>
+
 <table border="1">
     <tr>
       <th style="padding: 10px">FormGroup</th>
