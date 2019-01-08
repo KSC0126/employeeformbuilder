@@ -24,14 +24,7 @@ export class CreateEmployeeComponent implements OnInit {
   //   'proficiency': ''
   // };
   formErrors = {
-    'fullName': '',
-    'email': '',
-    'confirmEmail': '',
-    'emailGroup': '',
-    'phone': '',
-    'skillName': '',
-    'experienceInYears': '',
-    'proficiency': ''
+    
   }
   validationsMessages = {
     'fullName': {
@@ -51,16 +44,7 @@ export class CreateEmployeeComponent implements OnInit {
     },
     'phone': {
       'required': 'Phone is required.'
-    },
-    'skillName': {
-      'required': 'Skill Name is required.',
-    },
-    'experienceInYears': {
-      'required': 'Experience is required.',
-    },
-    'proficiency': {
-      'required': 'Proficiency is required.',
-    },
+    }
   }  
   
 
@@ -107,6 +91,11 @@ export class CreateEmployeeComponent implements OnInit {
       proficiency: ['', Validators.required]
   
     })
+    
+  }
+  addSkillButtonClick(){
+    console.log('addskills clicked');
+    (<FormArray>this.employeeForm.get('skills')).push(this.addSkillFormGroup());
   }
   logValidationErrors(group: FormGroup = this.employeeForm): void {
     Object.keys(group.controls).forEach((key: string) => {
@@ -125,16 +114,6 @@ export class CreateEmployeeComponent implements OnInit {
         this.logValidationErrors(abstractControl);
 
       } 
-      if (abstractControl instanceof FormArray) { // we are using this to validat the field in form array before we did for formgroup
-        for ( const control of abstractControl.controls){
-          if ( control  instanceof FormGroup)   {
-            this.logValidationErrors(control);
-        }
-        
-
-      }
-      
-    }
   });
     
 
