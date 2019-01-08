@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormControl, Validators, FormBuilder, AbstractControl } from '@angular/forms';
+import { FormGroup, FormControl, Validators, FormBuilder, AbstractControl, FormArray } from '@angular/forms';
 import { ValueConverter } from '@angular/compiler/src/render3/view/template';
 import { customValidators } from '../shared/custom.validator'
 
@@ -76,12 +76,9 @@ export class CreateEmployeeComponent implements OnInit {
       } , { validator: matchEmails}),
 
       phone: [''],
-      skills: this.fb.group({
-        skillName: ['', Validators.required],
-        experienceInYears: ['', Validators.required],
-        proficiency: ['', Validators.required]
-
-      })
+      skills: this.fb.array([
+        this.addSkillFormGroup()
+      ])
 
 
     });
@@ -101,6 +98,15 @@ export class CreateEmployeeComponent implements OnInit {
       this.contactPreferenceClicked(data);
     }// using to check the value that changes in contact preference
     );
+   
+  }
+  addSkillFormGroup(): FormGroup {
+    return this.fb.group({
+      skillName: ['', Validators.required],
+      experienceInYears: ['', Validators.required],
+      proficiency: ['', Validators.required]
+  
+    })
   }
   logValidationErrors(group: FormGroup = this.employeeForm): void {
     Object.keys(group.controls).forEach((key: string) => {
@@ -115,12 +121,22 @@ export class CreateEmployeeComponent implements OnInit {
           }
         } // before it is in the else but moved it on to the top in order to validate the whole fromgroup not just a formConttrol
       if (abstractControl instanceof FormGroup) {
+        
         this.logValidationErrors(abstractControl);
 
       } 
+      if (abstractControl instanceof FormArray) { // we are using this to validat the field in form array before we did for formgroup
+        for ( const control of abstractControl.controls){
+          if ( control  instanceof FormGroup)   {
+            this.logValidationErrors(control);
+        }
+        
+
+      }
       
-  
-    })
+    }
+  });
+    
 
   }
   contactPreferenceClicked(selectedValue: string) {
@@ -142,12 +158,18 @@ export class CreateEmployeeComponent implements OnInit {
   LoadDataClicked(): void {
     // this.logValidationErrors(this.employeeForm);
     // console.log(this.formErrors);
-
+     const formArray = this.fb.array([
+       new FormControl ('jhon', Validators.required),
+       new FormControl ('It', Validators.required),
+       new FormControl ('male', Validators.required),
+     ])
+ console.log(formArray.value);
   }
 
 
 
 }
+
 // Nested form group (emailGroup) is passed as a parameter. Retrieve email and
 // confirmEmail form controls. If the values are equal return null to indicate
 // validation passed otherwise an object with emailMismatch key. Please note we
@@ -174,3 +196,4 @@ function matchEmails(group: AbstractControl): { [key: string]: any } | null {
     return { 'emailMismatch': true };
   }
 }
+
