@@ -13,14 +13,26 @@ export class CreateEmployeeComponent implements OnInit {
   employeeForm: FormGroup;
   private isButtonVisible = true;
 
+  // formErrors = {
+  //   'fullName': '',
+  //   'email': '',
+  //   'confirmEmail': '',
+  //   'emailGroup':'',
+  //   'phone': '',
+  //   'skillName': '',
+  //   'experienceInYears': '',
+  //   'proficiency': ''
+  // };
   formErrors = {
     'fullName': '',
     'email': '',
+    'confirmEmail': '',
+    'emailGroup': '',
     'phone': '',
     'skillName': '',
     'experienceInYears': '',
     'proficiency': ''
-  };
+  }
   validationsMessages = {
     'fullName': {
       'required': ' Full name is required.',
@@ -29,6 +41,13 @@ export class CreateEmployeeComponent implements OnInit {
     }, 'email': {
       'required': 'Email is required.',
       'emailDomain': 'Email should be of Gmail.'
+    },
+    'confirmEmail': {
+      'required': 'you need to confirm the email.',
+    },
+    'emailGroup':{
+      'emailMismatch': 'email and confirm e mail does not match.'
+
     },
     'phone': {
       'required': 'Phone is required.'
@@ -42,7 +61,8 @@ export class CreateEmployeeComponent implements OnInit {
     'proficiency': {
       'required': 'Proficiency is required.',
     },
-  }
+  }  
+  
 
   constructor(private fb: FormBuilder) { }
 
@@ -50,7 +70,11 @@ export class CreateEmployeeComponent implements OnInit {
     this.employeeForm = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(10)]],
       contactPreference: ['email'],
-      email: ['', [Validators.required, customValidators.emailDomain('gmail.com')]],
+      emailGroup: this.fb.group({
+        email: ['', [Validators.required, customValidators.emailDomain('gmail.com')]],
+        confirmEmail: ['', Validators.required],
+      } , { validator: matchEmails}),
+
       phone: [''],
       skills: this.fb.group({
         skillName: ['', Validators.required],
@@ -81,11 +105,7 @@ export class CreateEmployeeComponent implements OnInit {
   logValidationErrors(group: FormGroup = this.employeeForm): void {
     Object.keys(group.controls).forEach((key: string) => {
       const abstractControl = group.get(key); // we wrote it as we dont know whether the key is coming form from or nested form
-      if (abstractControl instanceof FormGroup) {
-        this.logValidationErrors(abstractControl);
-
-      } else {
-        this.formErrors[key] = '';// to clear any existing validations error 
+      this.formErrors[key] = '';// to clear any existing validations error 
         if (abstractControl && !abstractControl.valid && (abstractControl.touched || abstractControl.dirty)) {
           const messages = this.validationsMessages[key];
           for (const errorKey in abstractControl.errors) {
@@ -93,8 +113,13 @@ export class CreateEmployeeComponent implements OnInit {
               this.formErrors[key] += messages[errorKey] + ''; // last lo space to give sapce b/w errors if they are more than 1
             }
           }
-        }
-      }
+        } // before it is in the else but moved it on to the top in order to validate the whole fromgroup not just a formConttrol
+      if (abstractControl instanceof FormGroup) {
+        this.logValidationErrors(abstractControl);
+
+      } 
+      
+  
     })
 
   }
@@ -109,9 +134,10 @@ export class CreateEmployeeComponent implements OnInit {
     phoneControl.updateValueAndValidity();
   }
   onSubmit(): void {
-    console.log(this.employeeForm.touched);
-    console.log(this.employeeForm.controls.fullName.value); // two types to get the form invidual values
-    console.log(this.employeeForm.get('fullName').value);
+    // console.log(this.employeeForm.touched);
+    // console.log(this.employeeForm.controls.fullName.value); // two types to get the form invidual values
+    // console.log(this.employeeForm.get('fullName').value);
+    console.log(this.employeeForm.value)
   }
   LoadDataClicked(): void {
     // this.logValidationErrors(this.employeeForm);
@@ -122,5 +148,29 @@ export class CreateEmployeeComponent implements OnInit {
 
 
 }
+// Nested form group (emailGroup) is passed as a parameter. Retrieve email and
+// confirmEmail form controls. If the values are equal return null to indicate
+// validation passed otherwise an object with emailMismatch key. Please note we
+// used this same key in the validationMessages object against emailGroup
+// property to store the corresponding validation error message
+// function matchEmail(group: AbstractControl): { [key: string]: any } | null {
+//   const emailControl = group.get('email');
+//   const confirmEmailControl = group.get('confirmEmail'); // till here we are trying to get both email and confirm email values.
+//   if (emailControl.value === confirmEmailControl.value || confirmEmailControl.pristine) {
+//     return null; // here we are checking if the email value === confirmEmail we return null with no validation errors
+//   } else {
+//     return { 'emailMismatch': true }
+// // in next step we need to tie this custom validator to our nested form group on the top
+//   }
+// }
 
+function matchEmails(group: AbstractControl): { [key: string]: any } | null {
+  const emailControl = group.get('email');
+  const confirmEmailControl = group.get('confirmEmail');
 
+  if (emailControl.value === confirmEmailControl.value || confirmEmailControl.pristine) {
+    return null;
+  } else {
+    return { 'emailMismatch': true };
+  }
+}
