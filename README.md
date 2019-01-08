@@ -1,6 +1,6 @@
 # Employeeformbuilder
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.1.4.
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.1.4.Which is developed to play around with Angular 6 reactive forms.
 
 ## Development server
 
