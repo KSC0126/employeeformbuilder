@@ -134,6 +134,10 @@ export class CreateEmployeeComponent implements OnInit {
     // console.log(this.employeeForm.get('fullName').value);
     console.log(this.employeeForm.value)
   }
+  removeSkillSet(selectedSkillIndex : number ): void{
+    (<FormArray>this.employeeForm.get('skills')).removeAt(selectedSkillIndex);
+
+  }
   LoadDataClicked(): void {
     // this.logValidationErrors(this.employeeForm);
     // console.log(this.formErrors);
