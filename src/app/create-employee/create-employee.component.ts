@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormBuilder, AbstractControl, FormArray } from '@angular/forms';
 import { ValueConverter } from '@angular/compiler/src/render3/view/template';
-import { customValidators } from '../shared/custom.validator'
+import { customValidators } from '../shared/custom.validator';
+import { ActivatedRoute } from '@angular/router';
+import { EmployeeService } from './employee.service';
+import { IEmployee } from './models/iemployee';
 
 @Component({
   selector: 'app-create-employee',
@@ -24,7 +27,7 @@ export class CreateEmployeeComponent implements OnInit {
   //   'proficiency': ''
   // };
   formErrors = {
-    
+
   }
   validationsMessages = {
     'fullName': {
@@ -38,17 +41,19 @@ export class CreateEmployeeComponent implements OnInit {
     'confirmEmail': {
       'required': 'you need to confirm the email.',
     },
-    'emailGroup':{
+    'emailGroup': {
       'emailMismatch': 'email and confirm e mail does not match.'
 
     },
     'phone': {
       'required': 'Phone is required.'
     }
-  }  
-  
+  }
 
-  constructor(private fb: FormBuilder) { }
+
+  constructor(private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private employeeService: EmployeeService) { }
 
   ngOnInit() {
     this.employeeForm = this.fb.group({
@@ -57,7 +62,7 @@ export class CreateEmployeeComponent implements OnInit {
       emailGroup: this.fb.group({
         email: ['', [Validators.required, customValidators.emailDomain('gmail.com')]],
         confirmEmail: ['', Validators.required],
-      } , { validator: matchEmails}),
+      }, { validator: matchEmails }),
 
       phone: [''],
       skills: this.fb.array([
@@ -82,18 +87,44 @@ export class CreateEmployeeComponent implements OnInit {
       this.contactPreferenceClicked(data);
     }// using to check the value that changes in contact preference
     );
-   
+
+    this.route.paramMap.subscribe(params => {
+      const empId = +params.get('id'); // + symbol is type casting it to a number
+      if (empId) {
+        this.getEmployee(empId);
+      }
+    })
+
+  }
+  getEmployee(id: number) {
+    this.employeeService.getEmployee(id).subscribe(
+      (employee: IEmployee) => this.editEmployee(employee),
+      (err: any) => console.log(err)
+    );
+
+  }
+  editEmployee(employee: IEmployee) {
+    this.employeeForm.patchValue({
+      fullName: employee.fullName,
+      contactPreference: employee.contactPreference,
+      emailGroup: {
+        email: employee.email,
+        confirmEmail: employee.email,
+      },
+      phone: employee.phone
+
+    });
   }
   addSkillFormGroup(): FormGroup {
     return this.fb.group({
       skillName: ['', Validators.required],
       experienceInYears: ['', Validators.required],
       proficiency: ['', Validators.required]
-  
+
     })
-    
+
   }
-  addSkillButtonClick(){
+  addSkillButtonClick() {
     console.log('addskills clicked');
     (<FormArray>this.employeeForm.get('skills')).push(this.addSkillFormGroup());
   }
@@ -101,21 +132,21 @@ export class CreateEmployeeComponent implements OnInit {
     Object.keys(group.controls).forEach((key: string) => {
       const abstractControl = group.get(key); // we wrote it as we dont know whether the key is coming form from or nested form
       this.formErrors[key] = '';// to clear any existing validations error 
-        if (abstractControl && !abstractControl.valid && (abstractControl.touched || abstractControl.dirty)) {
-          const messages = this.validationsMessages[key];
-          for (const errorKey in abstractControl.errors) {
-            if (errorKey) {
-              this.formErrors[key] += messages[errorKey] + ''; // last lo space to give sapce b/w errors if they are more than 1
-            }
+      if (abstractControl && !abstractControl.valid && (abstractControl.touched || abstractControl.dirty || abstractControl.value !=='')) {
+        const messages = this.validationsMessages[key];
+        for (const errorKey in abstractControl.errors) {
+          if (errorKey) {
+            this.formErrors[key] += messages[errorKey] + ''; // last lo space to give sapce b/w errors if they are more than 1
           }
-        } // before it is in the else but moved it on to the top in order to validate the whole fromgroup not just a formConttrol
+        }
+      } // before it is in the else but moved it on to the top in order to validate the whole fromgroup not just a formConttrol
       if (abstractControl instanceof FormGroup) {
-        
+
         this.logValidationErrors(abstractControl);
 
-      } 
-  });
-    
+      }
+    });
+
 
   }
   contactPreferenceClicked(selectedValue: string) {
@@ -134,19 +165,19 @@ export class CreateEmployeeComponent implements OnInit {
     // console.log(this.employeeForm.get('fullName').value);
     console.log(this.employeeForm.value)
   }
-  removeSkillSet(selectedSkillIndex : number ): void{
+  removeSkillSet(selectedSkillIndex: number): void {
     (<FormArray>this.employeeForm.get('skills')).removeAt(selectedSkillIndex);
 
   }
   LoadDataClicked(): void {
     // this.logValidationErrors(this.employeeForm);
     // console.log(this.formErrors);
-     const formArray = this.fb.array([
-       new FormControl ('jhon', Validators.required),
-       new FormControl ('It', Validators.required),
-       new FormControl ('male', Validators.required),
-     ])
- console.log(formArray.value);
+    const formArray = this.fb.array([
+      new FormControl('jhon', Validators.required),
+      new FormControl('It', Validators.required),
+      new FormControl('male', Validators.required),
+    ])
+    console.log(formArray.value);
   }
 
 
@@ -173,7 +204,7 @@ function matchEmails(group: AbstractControl): { [key: string]: any } | null {
   const emailControl = group.get('email');
   const confirmEmailControl = group.get('confirmEmail');
 
-  if (emailControl.value === confirmEmailControl.value || confirmEmailControl.pristine) {
+  if (emailControl.value === confirmEmailControl.value || (confirmEmailControl.pristine && confirmEmailControl.value=='')) {
     return null;
   } else {
     return { 'emailMismatch': true };
