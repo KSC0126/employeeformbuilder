@@ -5,5 +5,5 @@ export interface IEmployee {
     email: string;
     phone? : number;
     contactPreference: string;
-    Iskills: Iskills[];
+    skills: Iskills[];
 }

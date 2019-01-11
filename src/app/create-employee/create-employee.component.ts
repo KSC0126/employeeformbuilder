@@ -5,6 +5,7 @@ import { customValidators } from '../shared/custom.validator';
 import { ActivatedRoute } from '@angular/router';
 import { EmployeeService } from './employee.service';
 import { IEmployee } from './models/iemployee';
+import { Iskills } from './models/iskills';
 
 @Component({
   selector: 'app-create-employee',
@@ -114,6 +115,23 @@ export class CreateEmployeeComponent implements OnInit {
       phone: employee.phone
 
     });
+    this.employeeForm.setControl('skills', this.setExistingSkills(employee.skills));
+  }
+  setExistingSkills(skillSets: Iskills[]): FormArray{
+    const formArray = new FormArray([]);
+     skillSets.forEach( s=>{
+        formArray.push(this.fb.group({
+          skillName :s.skillName,
+          experienceInYears: s.experienceInYears,
+          proficiency : s.proficiency
+        })
+
+     )});
+
+      return formArray;
+    
+
+
   }
   addSkillFormGroup(): FormGroup {
     return this.fb.group({
@@ -166,7 +184,10 @@ export class CreateEmployeeComponent implements OnInit {
     console.log(this.employeeForm.value)
   }
   removeSkillSet(selectedSkillIndex: number): void {
-    (<FormArray>this.employeeForm.get('skills')).removeAt(selectedSkillIndex);
+    const skillsFormArray = <FormArray>this.employeeForm.get('skills');
+    skillsFormArray.removeAt(selectedSkillIndex);
+    skillsFormArray.markAsDirty();
+    skillsFormArray.markAsTouched();
 
   }
   LoadDataClicked(): void {
