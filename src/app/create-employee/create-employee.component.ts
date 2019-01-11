@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormBuilder, AbstractControl, FormArray } from '@angular/forms';
 import { ValueConverter } from '@angular/compiler/src/render3/view/template';
 import { customValidators } from '../shared/custom.validator';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { EmployeeService } from './employee.service';
 import { IEmployee } from './models/iemployee';
 import { Iskills } from './models/iskills';
@@ -16,6 +16,8 @@ export class CreateEmployeeComponent implements OnInit {
 
   employeeForm: FormGroup;
   private isButtonVisible = true;
+  employee : IEmployee;
+  pageTitle:string;
 
   // formErrors = {
   //   'fullName': '',
@@ -54,7 +56,8 @@ export class CreateEmployeeComponent implements OnInit {
 
   constructor(private fb: FormBuilder,
     private route: ActivatedRoute,
-    private employeeService: EmployeeService) { }
+    private employeeService: EmployeeService,
+   private router: Router) { }
 
   ngOnInit() {
     this.employeeForm = this.fb.group({
@@ -93,13 +96,29 @@ export class CreateEmployeeComponent implements OnInit {
       const empId = +params.get('id'); // + symbol is type casting it to a number
       if (empId) {
         this.getEmployee(empId);
+        this.pageTitle ="Edit Employee";
+      } else{
+        this.pageTitle ="Create Employee";
+        this.employee={
+          id:null,
+          fullName:'',
+          phone:null,
+          contactPreference:'',
+          email:'',
+          skills:[]
+
+
+
+        };
       }
     })
 
   }
   getEmployee(id: number) {
     this.employeeService.getEmployee(id).subscribe(
-      (employee: IEmployee) => this.editEmployee(employee),
+      (employee: IEmployee) => {this.editEmployee(employee);
+      this.employee = employee;
+    },
       (err: any) => console.log(err)
     );
 
@@ -181,8 +200,28 @@ export class CreateEmployeeComponent implements OnInit {
     // console.log(this.employeeForm.touched);
     // console.log(this.employeeForm.controls.fullName.value); // two types to get the form invidual values
     // console.log(this.employeeForm.get('fullName').value);
-    console.log(this.employeeForm.value)
+    //console.log(this.employeeForm.value)
+    this.mapFormValuesToEmployeeModel();
+    if(this.employee.id){
+    this.employeeService.updateEmployee(this.employee).subscribe(// now we need a function to map the values in edit form and to send employee model which maps to update url
+      ()=>this.router.navigate(['list']),
+      (err)=> console.log(err)
+    ) }
+    else{this.employeeService.addEmployee(this.employee).subscribe(// now we need a function to post new employee details
+      ()=>this.router.navigate(['list']),
+      (err)=> console.log(err)
+    )}
+      
   }
+  mapFormValuesToEmployeeModel(){
+    this.employee.fullName=this.employeeForm.value.fullName;// here we are capturing the updated full name value and storing it to new employee from whihc we send to the employee model
+    this.employee.contactPreference= this.employeeForm.value.contactPreference;
+    this.employee.email= this.employeeForm.value.emailGroup.email;
+    this.employee.phone= this.employeeForm.value.phone;
+    this.employee.skills= this.employeeForm.value.skills;
+  
+  }
+
   removeSkillSet(selectedSkillIndex: number): void {
     const skillsFormArray = <FormArray>this.employeeForm.get('skills');
     skillsFormArray.removeAt(selectedSkillIndex);
