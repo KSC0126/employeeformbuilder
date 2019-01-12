@@ -2,23 +2,28 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { ListEmployeeComponent } from '../app/list-employee/list-employee.component';
 import { CreateEmployeeComponent } from '../app/create-employee/create-employee.component';
+import { HomeComponent } from './home/home.component';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 
 const routes: Routes = [
+  
   {
-    path:'list',
-    component:ListEmployeeComponent
+    path:'home',
+    component:HomeComponent
 
   },
   {
-    path:'create',
-    component:CreateEmployeeComponent
+    path:'**',
+    component:PageNotFoundComponent
 
   },
   {
-    path:'edit/:id',
-    component:CreateEmployeeComponent
+    path:'',
+    redirectTo:'/home',
+    pathMatch:'full'
 
   }
+
 ];
 
 @NgModule({
