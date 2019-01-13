@@ -6,8 +6,7 @@ import { CreateEmployeeComponent } from './create-employee.component';
 
 
 const routes: Routes = [
-  {
-    path:'employees' , children:[
+  
       {
         path:'',
         component:ListEmployeeComponent
@@ -24,12 +23,7 @@ const routes: Routes = [
     
       }
       
-    ]
-  }
-  
-  
-
-];
+    ];
 
 @NgModule({
   imports: [

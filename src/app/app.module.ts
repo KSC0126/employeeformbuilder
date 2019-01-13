@@ -4,7 +4,6 @@ import { FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
-import { EmployeeModule } from './create-employee/employee.module';
 
 import {EmployeeService} from '../app/create-employee/employee.service';
 
@@ -21,7 +20,6 @@ import { PageNotFoundComponent } from './page-not-found/page-not-found.component
   ],
   imports: [
     BrowserModule,
-    EmployeeModule,
     AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,

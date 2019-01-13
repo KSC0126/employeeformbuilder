@@ -11,6 +11,11 @@ const routes: Routes = [
     path:'home',
     component:HomeComponent
 
+  },{
+    path:'employees',
+    loadChildren:'./create-employee/employee.module#EmployeeModule'
+    
+
   },
   {
     path:'**',
@@ -22,7 +27,8 @@ const routes: Routes = [
     redirectTo:'/home',
     pathMatch:'full'
 
-  }
+  },
+  
 
 ];
 
