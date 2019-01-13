@@ -1,9 +1,8 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ListEmployeeComponent } from '../list-employee/list-employee.component';
 import { CreateEmployeeComponent } from './create-employee.component';
-import { ReactiveFormsModule } from '@angular/forms';
-import { EmployeeRoutingModule } from '../create-employee/employee-routing.module'
+import { EmployeeRoutingModule } from '../create-employee/employee-routing.module';
+import { SharedModule } from '../shared/shared.module'
 
 @NgModule({
   declarations: [
@@ -12,9 +11,8 @@ import { EmployeeRoutingModule } from '../create-employee/employee-routing.modul
     
   ],
   imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    EmployeeRoutingModule
+    EmployeeRoutingModule,
+    SharedModule
   ]
 })
 export class EmployeeModule { }

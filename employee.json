@@ -56,6 +56,34 @@
           "proficiency": "intermediate"
         }
       ]
+    },
+    {
+      "id": 4,
+      "fullName": "theja",
+      "phone": "",
+      "contactPreference": "email",
+      "email": "theja@gmail.com",
+      "skills": [
+        {
+          "skillName": "react",
+          "experienceInYears": "1",
+          "proficiency": "intermediate"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "fullName": "bathi",
+      "phone": "",
+      "contactPreference": "email",
+      "email": "bathi@gmail.com",
+      "skills": [
+        {
+          "skillName": "sales force",
+          "experienceInYears": "1",
+          "proficiency": "beginner"
+        }
+      ]
     }
   ]
 }

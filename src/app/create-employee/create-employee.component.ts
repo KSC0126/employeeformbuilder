@@ -16,8 +16,9 @@ export class CreateEmployeeComponent implements OnInit {
 
   employeeForm: FormGroup;
   private isButtonVisible = true;
-  employee : IEmployee;
-  pageTitle:string;
+  employee: IEmployee;
+  pageTitle: string;
+  
 
   // formErrors = {
   //   'fullName': '',
@@ -57,7 +58,7 @@ export class CreateEmployeeComponent implements OnInit {
   constructor(private fb: FormBuilder,
     private route: ActivatedRoute,
     private employeeService: EmployeeService,
-   private router: Router) { }
+    private router: Router) { }
 
   ngOnInit() {
     this.employeeForm = this.fb.group({
@@ -96,16 +97,16 @@ export class CreateEmployeeComponent implements OnInit {
       const empId = +params.get('id'); // + symbol is type casting it to a number
       if (empId) {
         this.getEmployee(empId);
-        this.pageTitle ="Edit Employee";
-      } else{
-        this.pageTitle ="Create Employee";
-        this.employee={
-          id:null,
-          fullName:'',
-          phone:null,
-          contactPreference:'',
-          email:'',
-          skills:[]
+        this.pageTitle = "Edit Employee";
+      } else {
+        this.pageTitle = "Create Employee";
+        this.employee = {
+          id: null,
+          fullName: '',
+          phone: null,
+          contactPreference: '',
+          email: '',
+          skills: []
 
 
 
@@ -116,9 +117,10 @@ export class CreateEmployeeComponent implements OnInit {
   }
   getEmployee(id: number) {
     this.employeeService.getEmployee(id).subscribe(
-      (employee: IEmployee) => {this.editEmployee(employee);
-      this.employee = employee;
-    },
+      (employee: IEmployee) => {
+        this.editEmployee(employee);
+        this.employee = employee;
+      },
       (err: any) => console.log(err)
     );
 
@@ -136,19 +138,20 @@ export class CreateEmployeeComponent implements OnInit {
     });
     this.employeeForm.setControl('skills', this.setExistingSkills(employee.skills));
   }
-  setExistingSkills(skillSets: Iskills[]): FormArray{
+  setExistingSkills(skillSets: Iskills[]): FormArray {
     const formArray = new FormArray([]);
-     skillSets.forEach( s=>{
-        formArray.push(this.fb.group({
-          skillName :s.skillName,
-          experienceInYears: s.experienceInYears,
-          proficiency : s.proficiency
-        })
+    skillSets.forEach(s => {
+      formArray.push(this.fb.group({
+        skillName: s.skillName,
+        experienceInYears: s.experienceInYears,
+        proficiency: s.proficiency
+      })
 
-     )});
+      )
+    });
 
-      return formArray;
-    
+    return formArray;
+
 
 
   }
@@ -169,7 +172,7 @@ export class CreateEmployeeComponent implements OnInit {
     Object.keys(group.controls).forEach((key: string) => {
       const abstractControl = group.get(key); // we wrote it as we dont know whether the key is coming form from or nested form
       this.formErrors[key] = '';// to clear any existing validations error 
-      if (abstractControl && !abstractControl.valid && (abstractControl.touched || abstractControl.dirty || abstractControl.value !=='')) {
+      if (abstractControl && !abstractControl.valid && (abstractControl.touched || abstractControl.dirty || abstractControl.value !== '')) {
         const messages = this.validationsMessages[key];
         for (const errorKey in abstractControl.errors) {
           if (errorKey) {
@@ -202,24 +205,27 @@ export class CreateEmployeeComponent implements OnInit {
     // console.log(this.employeeForm.get('fullName').value);
     //console.log(this.employeeForm.value)
     this.mapFormValuesToEmployeeModel();
-    if(this.employee.id){
-    this.employeeService.updateEmployee(this.employee).subscribe(// now we need a function to map the values in edit form and to send employee model which maps to update url
-      ()=>this.router.navigate(['list']),
-      (err)=> console.log(err)
-    ) }
-    else{this.employeeService.addEmployee(this.employee).subscribe(// now we need a function to post new employee details
-      ()=>this.router.navigate(['list']),
-      (err)=> console.log(err)
-    )}
-      
+    if (this.employee.id) {
+      this.employeeService.updateEmployee(this.employee).subscribe(// now we need a function to map the values in edit form and to send employee model which maps to update url
+        () => this.router.navigate(['employees']),
+        (err) => console.log(err)
+      )
+    }
+    else {
+      this.employeeService.addEmployee(this.employee).subscribe(// now we need a function to post new employee details
+        () => this.router.navigate(['employees']),
+        (err) => console.log(err)
+      )
+    }
+
   }
-  mapFormValuesToEmployeeModel(){
-    this.employee.fullName=this.employeeForm.value.fullName;// here we are capturing the updated full name value and storing it to new employee from whihc we send to the employee model
-    this.employee.contactPreference= this.employeeForm.value.contactPreference;
-    this.employee.email= this.employeeForm.value.emailGroup.email;
-    this.employee.phone= this.employeeForm.value.phone;
-    this.employee.skills= this.employeeForm.value.skills;
-  
+  mapFormValuesToEmployeeModel() {
+    this.employee.fullName = this.employeeForm.value.fullName;// here we are capturing the updated full name value and storing it to new employee from whihc we send to the employee model
+    this.employee.contactPreference = this.employeeForm.value.contactPreference;
+    this.employee.email = this.employeeForm.value.emailGroup.email;
+    this.employee.phone = this.employeeForm.value.phone;
+    this.employee.skills = this.employeeForm.value.skills;
+
   }
 
   removeSkillSet(selectedSkillIndex: number): void {
@@ -264,7 +270,7 @@ function matchEmails(group: AbstractControl): { [key: string]: any } | null {
   const emailControl = group.get('email');
   const confirmEmailControl = group.get('confirmEmail');
 
-  if (emailControl.value === confirmEmailControl.value || (confirmEmailControl.pristine && confirmEmailControl.value=='')) {
+  if (emailControl.value === confirmEmailControl.value || (confirmEmailControl.pristine && confirmEmailControl.value == '')) {
     return null;
   } else {
     return { 'emailMismatch': true };
